@@ -61,13 +61,10 @@ var drinksController = (function () {
         drink: function (id) {
             let flag = false;
             if (data.drunkenness < 100) {
-                console.log(id);
                 data.bottles.forEach(element => {
                     if (element.id == id && element.numberOfDrinks != 0) {
-                        console.log("Uslo u petlju!");
                         element.numberOfDrinks = element.numberOfDrinks - 1;
                         increaseDrunkenness();
-                        console.log(data.drunkenness);
                         flag = true;
                     }
                 });
@@ -84,8 +81,7 @@ var drinksController = (function () {
 var UIController = (function () {
     return {
         displayBottles: function (arrayOfBottles) {
-            let html = `<label for="drinks">Choose a coctail:</label>
-            <select name="drinks" id="drinks">`;
+            let html = `<select name="drinks" id="drinks"><option value="" selected disabled hidden>Look for your fav cocktail here</option>`;
             arrayOfBottles.forEach(element => {
                 html += `<option value=${element.id}>${element.name} (${element.numberOfDrinks})</option>`;
             });
@@ -95,25 +91,56 @@ var UIController = (function () {
         getDrink: function () {
             return parseInt(document.getElementById("drinks").value);
         },
-        getDrink2: function () {
-            return document.getElementById("drinks").options[document.getElementById("drinks").selectedIndex].text.split('(')[0];
+        yourDrinks: function () {
+            drinkName = document.getElementById("drinks").options[document.getElementById("drinks").selectedIndex].text.split('(')[0];
+            const drink = document.createElement("li");
+            drink.innerHTML = drinkName;
+            document.querySelector(".drinks-diary ul").appendChild(drink);
         },
-        move: function (brojac) {
+        noDrinksLeftInTheBottle: function () {
+            drinkName = document.getElementById("drinks").options[document.getElementById("drinks").selectedIndex].text.split('(')[0];
+            alert("You already drank all " + drinkName);
+        },
+        alreadyDrunk: function () {
+            alert("Already drunk, go home");
+        },
+        move: function (drunkenness) {
             var elem = document.getElementById("myBar");
-            var width = brojac;
+            var width = 0;
             var id = setInterval(frame, 10);
             function frame() {
-                if (width >= brojac) {
+                if (width >= drunkenness) {
                     clearInterval(id);
                 } else {
                     width++;
                     elem.style.width = width + '%';
                     elem.innerHTML = width * 1 + '%';
+                    if (drunkenness > 60) {
+                        elem.setAttribute('class', 'w3-container w3-red w3-center');
+                    } else if (drunkenness > 20) {
+                        elem.setAttribute('class', 'w3-container w3-blue w3-center');
+                    }
                 }
             }
         },
         displayPics: function (drunkenness) {
-            document.querySelector(".pic").innerHTML = `<img src="${drunkenness / 20 + 1}d.png" alt="not drunk at all" />`;
+            switch (drunkenness) {
+                case 20:
+                    document.querySelector(".pic").innerHTML = `<img src="${drunkenness / 20}d.png" alt="not-drunk-at-all" /><h2>Not drunk at all</h2>`;
+                    break;
+                case 40:
+                    document.querySelector(".pic").innerHTML = `<img src="${drunkenness / 20}d.png" alt="get-this-party-started" /><h2>Get this party started</h2>`;
+                    break;
+                case 60:
+                    document.querySelector(".pic").innerHTML = `<img src="${drunkenness / 20}d.png" alt="lets-dance" /><h2>Let's dance</h2>`;
+                    break;
+                case 80:
+                    document.querySelector(".pic").innerHTML = `<img src="${drunkenness / 20}d.png" alt="ciganine-ti-sto-sviras" /><h2>Ciganine ti sto sviras</h2>`;
+                    break;
+                case 100:
+                    document.querySelector(".pic").innerHTML = `<img src="${drunkenness / 20}d.png" alt="maybe-i-should-get-some-help" /><h2>Maybe you should get some help</h2>`;
+                    break;
+            }
         }
     }
 })();
@@ -130,22 +157,21 @@ var controller = (function (drinksCTRL, UICTRL) {
     }
 
     let gettingDrunk = function () {
-
-        if (drinksController.getDrunkenness() < 80) {
+        if (drinksController.getDrunkenness() < 100) {
             id = UICTRL.getDrink();
             if (drinksController.drink(id)) {
-                move(drinksController.getDrunkenness());
+                UICTRL.yourDrinks();
+                UICTRL.move(drinksController.getDrunkenness());
                 updateBottles();
                 setupListeners();
                 let drunkenness = drinksCTRL.getDrunkenness();
                 UICTRL.displayPics(drunkenness);
             }
             else {
-                drinkName = UICTRL.getDrink2();
-                alert("You already drank all " + drinkName);
+                UICTRL.noDrinksLeftInTheBottle();
             }
         } else {
-            alert("Already drunk, go home");
+            UICTRL.alreadyDrunk();
         }
     }
 

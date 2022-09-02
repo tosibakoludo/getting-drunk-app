@@ -16,6 +16,11 @@
     height: 500px;
 }
 
-.w3-container {
+ul {
+    list-style: none
+}
+
+.drink-selector,
+.drinks-diary {
     text-align: center;
 }
