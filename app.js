@@ -1,19 +1,3 @@
-function move(brojac) {
-    var elem = document.getElementById("myBar");
-    var width = brojac;
-    brojac += 20;
-    var id = setInterval(frame, 10);
-    function frame() {
-        if (width >= brojac) {
-            clearInterval(id);
-        } else {
-            width++;
-            elem.style.width = width + '%';
-            elem.innerHTML = width * 1 + '%';
-        }
-    }
-}
-
 //Drinks controller ('Model')
 var drinksController = (function () {
     class Men {
